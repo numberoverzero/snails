@@ -18,6 +18,7 @@ if __name__ == "__main__":
         version=VERSION,
         description="minimal smtpd handler",
         long_description=README,
+        long_description_content_type="text/x-rst",
         author="Joe Cross",
         author_email="joe.mcross@gmail.com",
         url="https://github.com/numberoverzero/snails",

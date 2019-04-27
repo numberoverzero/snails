@@ -4,6 +4,7 @@
 Sometimes you want to write a dumb email handler.
 
 Good for: low volume, minimal parsing, interacting with legacy email-based systems
+
 Bad for: high volume, production use, 100% RFC compliance
 
 
