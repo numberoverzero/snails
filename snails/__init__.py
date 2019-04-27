@@ -8,7 +8,7 @@ from email.message import Message
 from typing import Callable, Optional
 
 __all__ = ["Mailbox", "Message", "serve"]
-__version__ = "0.0.0"
+__version__ = "1.0"
 
 SNAILS_ERROR = "500 Could not process your message"
 SNAILS_OK = "250 OK"
@@ -41,7 +41,7 @@ class Mailbox:
         """
             Usage:
 
-        .. code-block: python
+        .. code-block:: python
 
             import snails
             def handle(msg: snails.Message) -> None:
@@ -79,7 +79,7 @@ def serve(handler: _MailHandler, host: str, port: int, block: bool = True, clean
 
     Usage:
 
-    .. code-block: python
+    .. code-block:: python
 
         import snails
         def handle(msg: snails.Message) -> None:

@@ -7,7 +7,7 @@ VERSION = "VERSION-NOT-FOUND"
 for line in (HERE / "snails" / "__init__.py").read_text().split("\n"):
     if line.startswith("__version__"):
         VERSION = eval(line.split("=")[-1])
-
+README = (HERE / "README.rst").read_text()
 REQUIREMENTS = [
     "aiosmtpd"
 ]
@@ -16,6 +16,8 @@ if __name__ == "__main__":
     setup(
         name="snails",
         version=VERSION,
+        description="minimal smtpd handler",
+        long_description=README,
         author="Joe Cross",
         author_email="joe.mcross@gmail.com",
         url="https://github.com/numberoverzero/snails",
