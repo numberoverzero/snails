@@ -1,10 +1,17 @@
-.PHONY: help publish
+.PHONY: help clean build check publish
 
 help:
-	@echo "run make publish to upload"
+	@echo "make check: validate packaging before upload"
+	@echo "make publish: release to pypi"
 
-publish:
+clean:
 	rm -fr build dist .egg snails.egg-info
+
+build: clean
 	python setup.py sdist bdist_wheel
+
+check: build
 	twine check dist/*
+
+publish: check
 	twine upload dist/*
