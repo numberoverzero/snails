@@ -1,10 +1,10 @@
 import os
 import pathlib
-from setuptools import setup, find_packages
+from setuptools import setup
 
 HERE = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
 VERSION = "VERSION-NOT-FOUND"
-for line in (HERE / "snails" / "__init__.py").read_text().split("\n"):
+for line in (HERE / "snails.py").read_text().split("\n"):
     if line.startswith("__version__"):
         VERSION = eval(line.split("=")[-1])
 README = (HERE / "README.rst").read_text()
@@ -24,7 +24,6 @@ if __name__ == "__main__":
         url="https://github.com/numberoverzero/snails",
         license="MIT",
         platforms="any",
-        include_package_data=True,
-        packages=find_packages(exclude=("docs", "examples", "scripts", "tests")),
+        py_modules=["snails"],
         install_requires=REQUIREMENTS,
     )

@@ -30,37 +30,106 @@ Requires Python 3.7+
         for p in msg.get_payload():
             print(p.get_payload(decode=True))
 
+    # run and block until ctrl + c
+    snails.serve(handle, "127.0.0.1", 10025)
 
-    # manage your own mailbox start/stop
+    # or, call start/stop yourself
     mailbox = snails.Mailbox(handle, "127.0.0.1", 10025)
     mailbox.start()
 
-    # drop this in __main__, runs and blocks until Ctrl+C
-    snails.serve(handle, "127.0.0.1", 10025)
-
-==========
- Advanced
-==========
-
-Not much else to do here.  You can return an SMTP status string, but by default if you don't raise an exception it'll
-return "250 OK" and raising an exception returns "500 ..."
+============
+ Enable TLS
+============
 
 .. code-block:: python
 
-    # calls Mailbox.stop when the python interpreter cleans up
-    snails.serve(h, "localhost", 25, cleanup_at_exit=True)
+    import ssl
+    import snails
 
-    # blocks until KeyboardInterrupt
-    snails.serve(h, "localhost", 25, block=True)
 
-    # create a mailbox and start it, and return the object for use
-    mailbox = snails.serve(h, "localhost", 25, block=False, cleanup_at_exit=True)
-    ...  # your code here
-    mailbox.stop()
+    def handle(msg: bytes) -> None:
+        ...  # TODO
 
-    # create a mailbox without starting it
-    mailbox = snails.Mailbox(h, "localhost", 25)
-    ...  # your code here
-    mailbox.start()
-    ... # other code
-    mailbox.stop()
+
+    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    ssl_context.load_cert_chain("cert.pem", "key.pem")
+
+    mailbox = snails.Mailbox(handle, "::", 25, ssl_context=ssl_context)
+
+=================
+ Message Parsing
+=================
+
+When a new request arrives, ``snails`` will pass the envelope to a parser function.  You can either provide this
+parser yourself, or let snails infer the parser based on your handler's type annotations.
+
+Snails provides parsers for the following types:
+
+* ``bytes``
+* ``aiosmtpd.smtp.Envelope`` (aliased to ``snails.Envelope``)
+* ``email.message.Message`` (aliased to ``snails.Message``)
+
+
+Most of the time it's enough to use an annotation:
+
+.. code-block:: python
+
+    def handle(x: bytes):
+        with open("out.log", "wb") as f:
+            f.write(x)
+
+    def handle(x: snails.Envelope):
+        with open("out.log", "wb") as f:
+            f.write(x.content)
+
+    def handle(x: snails.Message):
+        with open("out.log", "wb") as f:
+            f.write(x.as_bytes())
+
+
+You can also define your own parser:
+
+.. code-block:: python
+
+    def parse(e: snails.Envelope) -> dict:
+        as_str = e.content.decode()
+        return {}  # TODO your parsing
+
+
+    def handle(x: dict):
+        ...  # TODO use the dict parsed above
+
+
+    mailbox = snails.Mailbox(handle, "::", 25, parser=parse)
+
+===============
+ Async Mailbox
+===============
+
+Your handler and parser can both be async functions; by default ``snails`` wraps all synchronous functions.
+
+.. code-block:: python
+
+    import snails
+
+    async def parse(e: snails.Envelope) -> dict:
+        as_str = e.content.decode()
+        return {}  # TODO your parsing
+
+
+    async def handle(x: dict):
+        res = await some_db_call(...)
+
+
+    mailbox = snails.Mailbox(handle, "::", 25, parser=parse)
+
+=======
+ Other
+=======
+
+* You can return a string from your handler such as ``"250 OK"`` or the built-in ``snails.SMTP_250``.
+* Instead of ``snails.serve`` use ``Mailbox.start`` and ``Mailbox.stop``
+* Call ``snails.serve`` with ``cleanup_at_exit=True`` to ensure ``Mailbox.stop`` is called
+  when the interpreter is shutting down (enabled by default)
+* Call ``snails.serve`` with ``block=True`` to block execution after calling ``Mailbox.start`` (enabled by default).
+  You can stop the server by sending SIGINT or Ctrl + C.
