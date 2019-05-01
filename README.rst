@@ -31,10 +31,12 @@ Requires Python 3.7+
             print(p.get_payload(decode=True))
 
     # run and block until ctrl + c
-    snails.serve(handle, "127.0.0.1", 10025)
+    snails.serve(handle, "0.0.0.0", 8025)
+
+.. code-block:: python
 
     # or, call start/stop yourself
-    mailbox = snails.Mailbox(handle, "127.0.0.1", 10025)
+    mailbox = snails.Mailbox(handle, "0.0.0.0", 8025)
     mailbox.start()
 
 ============
