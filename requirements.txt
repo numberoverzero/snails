@@ -1,9 +1,9 @@
 aiosmtpd
-coverage~=4.0
-flake8~=3.7
-pytest~=4.4
-sphinx==1.8.3
-sphinx-rtd-theme~=0.4
-tox~=3.8
-twine~=1.13
-wheel~=0.33
+coverage
+flake8
+pytest
+sphinx
+sphinx-rtd-theme
+tox
+twine
+wheel
